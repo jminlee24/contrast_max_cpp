@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION "3.19.2")
 
 project(main)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Eigen3 REQUIRED )
+add_library(filereader src/filereader.cpp)
 
-add_executable(main src/main.cpp)
-target_link_libraries(main Eigen3::Eigen)
-
+add_executable(${PROJECT_NAME} src/main.cpp)
