@@ -9,6 +9,11 @@
  * See the License for the specific language governing permissions and limitations under the License.                 *
  **********************************************************************************************************************/
 
+/**
+ * Modifications from the original: 
+ * - Outputs to an array of events rather than a csv
+ */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
