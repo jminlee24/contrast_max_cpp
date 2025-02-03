@@ -2,9 +2,44 @@
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Matrix.h>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
 namespace ContrastMax {
 using namespace FileReader;
+
+std::vector<std::vector<uint64_t>> create_image(filedata_t filedata) {
+  std::vector<event_t> events = filedata.events;
+
+  std::vector<std::vector<uint64_t>> img(
+      filedata.metadata.height,
+      std::vector<uint64_t>(filedata.metadata.width, 0));
+
+  for (event_t event : events) {
+    img[event.y][event.x] += event.pol;
+  }
+
+  return img;
+};
+
+void write_image(std::vector<std::vector<uint64_t>> image_data) {
+  std::ofstream imageFile("image.pgm");
+  if (imageFile.is_open()) {
+    imageFile << "P2" << std::endl;
+    imageFile << image_data[0].size() << " " << image_data.size() << std::endl;
+    imageFile << "15" << std::endl;
+    for (std::vector<uint64_t> rows : image_data) {
+      for (uint64_t val : rows) {
+        imageFile << val << " ";
+      }
+      imageFile << std::endl;
+    }
+    imageFile.close();
+  } else {
+    std::cerr << "Issue opening image.pgm\n";
+  }
+  return;
+}
 
 std::vector<event_t> warp_events(std::vector<event_t> events, double t,
                                  double theta[]) {
@@ -12,7 +47,10 @@ std::vector<event_t> warp_events(std::vector<event_t> events, double t,
   std::vector<event_t> warped_events;
 
   for (event_t event : events) {
-    warped_events.push_back(warp_event(event, t, theta));
+    event_t warped_event = warp_event(event, t, theta);
+    if (warped_event.pol != 2) {
+      warped_events.push_back(warped_event);
+    }
   }
 
   return warped_events;
@@ -37,6 +75,10 @@ event_t warp_event(event_t event, double t, double theta[]) {
   warped_event.y = warped_event_vector.coeff(1);
   warped_event.timestamp = warped_event_vector.coeff(2);
   warped_event.pol = event.pol;
+
+  if (warped_event_vector.coeff(0) < 0 || warped_event_vector.coeff(1) < 0) {
+    warped_event.pol = 2;
+  }
 
   return warped_event;
 }

@@ -2,6 +2,7 @@
 #include "filereader.hpp"
 #include <Eigen/Dense>
 
+#include <cstdint>
 #include <iostream>
 #include <vector>
 
@@ -15,22 +16,9 @@ int main() {
   std::vector<FileReader::event_t> events =
       FileReader::filter_event_time(fileData.events, 1000, 2000);
 
-  for (FileReader::event_t event : events) {
-    std::cout << "first" << std::endl;
-    std::cout << "x: " << event.x << std::endl;
-    std::cout << "y: " << event.y << std::endl;
-    std::cout << "timestamp: " << event.timestamp << std::endl;
-    std::cout << "polarity: " << event.pol << std::endl;
-
-    double theta[] = {0.0, 1.0, 0.0};
-    event = ContrastMax::warp_event(event, 1, theta);
-    std::cout << "next" << std::endl;
-
-    std::cout << "x: " << event.x << std::endl;
-    std::cout << "y: " << event.y << std::endl;
-    std::cout << "timestamp: " << event.timestamp << std::endl;
-    std::cout << "polarity: " << event.pol << std::endl;
-  }
+  std::vector<std::vector<uint64_t>> image =
+      ContrastMax::create_image(fileData);
+  ContrastMax::write_image(image);
 
   std::cout << events.size() << std::endl;
 
