@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -8,7 +9,7 @@ typedef struct {
   uint64_t timestamp;
   uint32_t x;
   uint32_t y;
-  bool res;
+  uint16_t pol;
 } event_t;
 
 typedef struct {
@@ -23,12 +24,15 @@ typedef struct {
 
 filedata_t read_file(std::string filename);
 
+std::vector<event_t> filter_event_time(std::vector<event_t>, uint64_t,
+                                       uint64_t);
+
 void print_events(std::vector<event_t>);
 
 }; // namespace FileReader
 
 namespace Evt3 {
-enum class EventType : uint8_t {
+enum class EventTypes : uint8_t {
   EVT_ADDR_Y = 0x0,
   EVT_ADDR_X = 0x2,
   VECT_BASE_X = 0x3,
