@@ -1,7 +1,9 @@
 #include "contrastmax.hpp"
+
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Matrix.h>
 #include <cmath>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 
@@ -40,6 +42,39 @@ void write_image(std::vector<std::vector<uint64_t>> image_data) {
   }
   return;
 }
+
+void write_image(std::vector<uint64_t> imgdata, uint64_t width,
+                 uint64_t height) {
+
+  std::ofstream imageFile("imageflat.pgm");
+  if (imageFile.is_open()) {
+    imageFile << "P2" << std::endl;
+    imageFile << width << " " << height << std::endl;
+    imageFile << "10" << std::endl;
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
+        imageFile << imgdata[width * i + j] << " ";
+      }
+      imageFile << std::endl;
+    }
+    imageFile.close();
+  } else {
+    std::cerr << "Issue opening imageflat.pgm\n";
+  }
+  return;
+}
+
+std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>> vector) {
+  std::vector<uint64_t> flat_vec;
+
+  for (auto vec : vector) {
+    flat_vec.insert(flat_vec.end(), vec.begin(), vec.end());
+  }
+
+  return flat_vec;
+}
+
+double calculate_variance(image_t image) { return 1.0; }
 
 std::vector<event_t> warp_events(std::vector<event_t> events, double t,
                                  double theta[]) {
