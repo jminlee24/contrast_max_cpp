@@ -10,43 +10,28 @@
 namespace ContrastMax {
 using namespace FileReader;
 
-std::vector<std::vector<uint64_t>> create_image(filedata_t filedata) {
+image_t create_image(filedata_t filedata) {
+  image_t imageinfo;
   std::vector<event_t> events = filedata.events;
 
-  std::vector<std::vector<uint64_t>> img(
-      filedata.metadata.height,
-      std::vector<uint64_t>(filedata.metadata.width, 0));
+  imageinfo.height = filedata.metadata.height;
+  imageinfo.width = filedata.metadata.width;
+
+  std::vector<uint64_t> img(filedata.metadata.height * filedata.metadata.width,
+                            0);
 
   for (event_t event : events) {
-    img[event.y][event.x] += event.pol;
+    img[event.y * imageinfo.width + event.x] += event.pol;
   }
+  imageinfo.imagedata = img;
 
-  return img;
+  return imageinfo;
 };
-
-void write_image(std::vector<std::vector<uint64_t>> image_data) {
-  std::ofstream imageFile("image.pgm");
-  if (imageFile.is_open()) {
-    imageFile << "P2" << std::endl;
-    imageFile << image_data[0].size() << " " << image_data.size() << std::endl;
-    imageFile << "15" << std::endl;
-    for (std::vector<uint64_t> rows : image_data) {
-      for (uint64_t val : rows) {
-        imageFile << val << " ";
-      }
-      imageFile << std::endl;
-    }
-    imageFile.close();
-  } else {
-    std::cerr << "Issue opening image.pgm\n";
-  }
-  return;
-}
 
 void write_image(std::vector<uint64_t> imgdata, uint64_t width,
                  uint64_t height) {
 
-  std::ofstream imageFile("imageflat.pgm");
+  std::ofstream imageFile("image.pgm");
   if (imageFile.is_open()) {
     imageFile << "P2" << std::endl;
     imageFile << width << " " << height << std::endl;
@@ -59,7 +44,7 @@ void write_image(std::vector<uint64_t> imgdata, uint64_t width,
     }
     imageFile.close();
   } else {
-    std::cerr << "Issue opening imageflat.pgm\n";
+    std::cerr << "Issue opening image.pgm\n";
   }
   return;
 }

@@ -16,8 +16,7 @@ typedef struct {
 std::vector<event_t> warp_events(std::vector<event_t>, double, double[]);
 event_t warp_event(event_t, double, double[]);
 
-std::vector<std::vector<uint64_t>> create_image(filedata_t);
-void write_image(std::vector<std::vector<uint64_t>>);
+image_t create_image(filedata_t);
 void write_image(std::vector<uint64_t>, uint64_t width, uint64_t height);
 
 std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>>);
