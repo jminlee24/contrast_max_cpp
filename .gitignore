@@ -6,3 +6,4 @@ data/
 .idea/
 CMakeSettings.json
 .cache
+.DS_Store
