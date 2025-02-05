@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+
 namespace ContrastMax {
 using namespace FileReader;
 
@@ -93,6 +94,7 @@ void write_image(image_t image) {
   }
   return;
 }
+
 std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>> vector) {
   std::vector<uint64_t> flat_vec;
 

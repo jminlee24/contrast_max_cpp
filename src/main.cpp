@@ -2,7 +2,6 @@
 #include "filereader.hpp"
 #include <Eigen/Dense>
 
-#include <cstdint>
 #include <iostream>
 #include <vector>
 
@@ -23,7 +22,6 @@ int main() {
       ContrastMax::create_image(fileData.events, width, height);
 
   ContrastMax::blur_image(image, .0);
-
   ContrastMax::write_image(image);
 
   std::cout << "number of events: " << events.size() << std::endl;
