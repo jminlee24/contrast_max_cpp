@@ -35,6 +35,7 @@ filedata_t read_file(std::string filename) {
   metadata_t metadata;
 
   std::ifstream input_file(filename, std::ios::in | std::ios::binary);
+  const auto tp_start = std::chrono::system_clock::now();
 
   if (!input_file.is_open()) {
     std::cerr << "Could not open file: " << filename << "\n";
@@ -266,6 +267,12 @@ filedata_t read_file(std::string filename) {
       }
     }
   }
+  const auto tp_end = std::chrono::system_clock::now();
+  const double duration_s =
+      std::chrono::duration_cast<std::chrono::microseconds>(tp_end - tp_start)
+          .count() /
+      1e6;
+  std::cout << "Decoded " << duration_s << " s" << std::endl;
 
   filedata.metadata = metadata;
   filedata.events = events;

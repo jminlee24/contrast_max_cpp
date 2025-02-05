@@ -1,5 +1,4 @@
 #include "contrastmax.hpp"
-#include "fastgaussianblur.hpp"
 #include "filereader.hpp"
 #include <Eigen/Dense>
 
@@ -18,23 +17,17 @@ int main() {
   int height = fileData.metadata.height;
 
   std::vector<FileReader::event_t> events =
-      FileReader::filter_event_time(fileData.events, 1000, 2000);
+      FileReader::filter_event_time(fileData.events, 1000, 1000000);
 
-  ContrastMax::image_t imageinfo = ContrastMax::create_image(fileData);
-  std::vector<float> blurred_img(imageinfo.width * imageinfo.height, 0);
-  std::vector<float> float_img(imageinfo.imagedata.begin(),
-                               imageinfo.imagedata.end());
+  ContrastMax::image_t image =
+      ContrastMax::create_image(fileData.events, width, height);
 
-  float *in = &float_img[0];
-  float *out = &blurred_img[0];
+  ContrastMax::blur_image(image, .0);
 
-  Gaussian::fast_gaussian_blur(in, out, imageinfo.width, imageinfo.height, 1.5);
-
-  std::vector<uint64_t> blurred_int(blurred_img.begin(), blurred_img.end());
-
-  ContrastMax::write_image(blurred_int, width, height);
+  ContrastMax::write_image(image);
 
   std::cout << "number of events: " << events.size() << std::endl;
+  std::cout << ContrastMax::calculate_variance(image) << std::endl;
 
   return 0;
 }
