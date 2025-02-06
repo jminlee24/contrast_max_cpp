@@ -21,11 +21,9 @@ image_t create_image(std::vector<event_t> events, int width, int height) {
 
   std::vector<uint64_t> img(height * width, 0);
 
-  int curmax = 0;
-
   for (event_t event : events) {
     img[event.y * imageinfo.width + event.x] += event.pol;
-    int val = img[event.y * imageinfo.width + event.x];
+    uint64_t val = img[event.y * imageinfo.width + event.x];
     imageinfo.num_events++;
     if (val > imageinfo.max) {
       imageinfo.max = val;
@@ -59,8 +57,8 @@ void write_image(std::vector<uint64_t> imgdata, uint64_t width,
     imageFile << "P2" << std::endl;
     imageFile << width << " " << height << std::endl;
     imageFile << "10" << std::endl;
-    for (int i = 0; i < height; i++) {
-      for (int j = 0; j < width; j++) {
+    for (uint64_t i = 0; i < height; i++) {
+      for (uint64_t j = 0; j < width; j++) {
         imageFile << imgdata[width * i + j] << " ";
       }
       imageFile << std::endl;
@@ -105,11 +103,15 @@ std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>> vector) {
   return flat_vec;
 }
 
-double singlepass(filedata_t filedata, double *x0) {
+void maximize() {}
+
+double singlepass(filedata_t filedata, Eigen::Vector3d x0) {
+
   std::vector<event_t> warped_events = warp_events(filedata.events, x0);
 
   image_t image = create_image(warped_events, filedata.metadata.width,
                                filedata.metadata.height);
+
   double variance = calculate_variance(image);
 
   return -variance;
@@ -117,6 +119,9 @@ double singlepass(filedata_t filedata, double *x0) {
 
 double calculate_variance(image_t image) {
   double n_p = image.num_events;
+  if (n_p < 1) {
+    return 0;
+  }
   int size = image.width * image.height;
 
   double mean = n_p / size;
@@ -129,12 +134,16 @@ double calculate_variance(image_t image) {
   return variance / size;
 }
 
-std::vector<event_t> warp_events(std::vector<event_t> events, double theta[]) {
+std::vector<event_t> warp_events(std::vector<event_t> events,
+                                 Eigen::Vector3d theta) {
 
   std::vector<event_t> warped_events;
+  uint64_t t0 = events[0].timestamp;
 
   for (event_t event : events) {
-    event_t warped_event = warp_event(event, theta);
+    uint64_t t = event.timestamp - t0;
+
+    event_t warped_event = warp_event(event, t, theta);
     if (warped_event.pol != 2) {
       warped_events.push_back(warped_event);
     }
@@ -143,17 +152,16 @@ std::vector<event_t> warp_events(std::vector<event_t> events, double theta[]) {
   return warped_events;
 }
 
-event_t warp_event(event_t event, double theta[]) {
+event_t warp_event(event_t event, uint64_t t, Eigen::Vector3d theta) {
   event_t warped_event;
 
   double x = event.x;
   double y = event.y;
-  double t = event.timestamp;
 
   Eigen::Vector3d event_vector{{x, y, 1}};
 
-  Eigen::Matrix3d theta_hat =
-      get_rotation_matrix(theta[0] * t, theta[1] * t, theta[2] * t);
+  Eigen::Matrix3d theta_hat = get_rotation_matrix(
+      theta.coeff(0) * t, theta.coeff(1) * t, theta.coeff(2) * t);
   Eigen::Matrix3d trans = get_translation_matrix(1, 1);
   Eigen::Matrix3d trans_inv = get_translation_matrix(-1, -1);
 
@@ -168,7 +176,6 @@ event_t warp_event(event_t event, double theta[]) {
   if (warped_event_vector.coeff(0) < 0 || warped_event_vector.coeff(1) < 0) {
     warped_event.pol = 2;
   }
-
   return warped_event;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "filereader.hpp"
 #include <Eigen/Dense>
+#include <Eigen/src/Core/Matrix.h>
 #include <cstdint>
 #include <vector>
 
@@ -15,8 +16,8 @@ typedef struct {
   std::vector<uint64_t> imagedata;
 } image_t;
 
-std::vector<event_t> warp_events(std::vector<event_t>, double[]);
-event_t warp_event(event_t, double[]);
+std::vector<event_t> warp_events(std::vector<event_t>, Eigen::Vector3d);
+event_t warp_event(event_t, uint64_t, Eigen::Vector3d);
 
 image_t create_image(std::vector<event_t>, int width, int height);
 void blur_image(image_t, float);
@@ -26,7 +27,7 @@ void write_image(image_t);
 std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>>);
 
 double calculate_variance(image_t);
-double singlepass(std::vector<event_t>, double[]);
+double singlepass(filedata_t, Eigen::Vector3d);
 
 Eigen::Matrix3d get_translation_matrix(double x, double y);
 Eigen::Matrix3d get_rotation_matrix(double roll, double pitch, double yaw);

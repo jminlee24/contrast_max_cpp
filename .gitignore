@@ -7,3 +7,4 @@ data/
 CMakeSettings.json
 .cache
 .DS_Store
+./lib/optim/
