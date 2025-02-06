@@ -124,7 +124,7 @@ double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
   }
 
   Eigen::Vector3d rx0;
-  rx0 << x0(0), x0(1), x0(2); // ✅ Assign explicitly
+  rx0 << x0(0), x0(1), x0(2);
 
   filedata_t filedata = *((filedata_t *)fd);
 
@@ -139,6 +139,10 @@ double singlepass(Eigen::Vector3d x0, filedata_t filedata) {
                                filedata.metadata.height);
 
   double variance = calculate_variance(image);
+  double std = sqrt(variance);
+
+  blur_image(image, std * 2);
+  variance = calculate_variance(image);
 
   return -variance;
 }

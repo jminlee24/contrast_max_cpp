@@ -20,7 +20,7 @@ int main() {
   ContrastMax::blur_image(image, .0);
 
   auto start = std::chrono::high_resolution_clock::now();
-  ContrastMax::maximize(fileData);
+  Eigen::Vector3d val = ContrastMax::maximize(fileData);
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
@@ -28,6 +28,7 @@ int main() {
   ContrastMax::write_image(image);
 
   std::cout << "Single pass: " << elapsed.count() << std::endl;
+  std::cout << val << std::endl;
   std::cout << events.size() << std::endl;
 
   return 0;
