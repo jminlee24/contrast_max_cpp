@@ -110,6 +110,9 @@ Eigen::Vector3d maximize(filedata_t filedata) {
   x0 << 0, 0, 0;
 
   bool success = optim::nm(x0, singlepass_optim, &filedata.events);
+  if (!success) {
+    std::cerr << "Optimization was unsuccessful";
+  }
 
   return x0;
 }
