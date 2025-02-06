@@ -3,7 +3,7 @@ decodes the raw into an array of events rather than a csv, most of the logic is 
 
 required libraries:
 Eigen 3.4
-OptimLib - Eigen - Header only sorry I am incompetent 
+OptimLib - Eigen - Header only 
 
 
 MAKE SURE YOU COMPILE IN RELEASE MODE, OR ELSE EIGEN WILL BE LITERALLY 1000x SLOWER
