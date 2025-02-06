@@ -1,7 +1,6 @@
 #pragma once
 #include "filereader.hpp"
 #include <Eigen/Dense>
-#include <Eigen/src/Core/Matrix.h>
 #include <cstdint>
 #include <vector>
 
@@ -27,7 +26,10 @@ void write_image(image_t);
 std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>>);
 
 double calculate_variance(image_t);
-double singlepass(filedata_t, Eigen::Vector3d);
+double singlepass(Eigen::Vector3d, filedata_t);
+double singlepass_optim(Eigen::VectorXd, Eigen::VectorXd *, void *);
+
+Eigen::Vector3d maximize(filedata_t);
 
 Eigen::Matrix3d get_translation_matrix(double x, double y);
 Eigen::Matrix3d get_rotation_matrix(double roll, double pitch, double yaw);

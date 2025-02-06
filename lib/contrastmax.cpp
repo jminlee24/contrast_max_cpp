@@ -1,5 +1,7 @@
 #include "contrastmax.hpp"
 #include "fastgaussianblur.hpp"
+#define OPTIM_ENABLE_EIGEN_WRAPPERS
+#include "optim/optim.hpp"
 
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Matrix.h>
@@ -103,9 +105,30 @@ std::vector<uint64_t> flatten_vec(std::vector<std::vector<uint64_t>> vector) {
   return flat_vec;
 }
 
-void maximize() {}
+Eigen::Vector3d maximize(filedata_t filedata) {
+  Eigen::VectorXd x0(3);
+  x0 << 0, 0, 0;
 
-double singlepass(filedata_t filedata, Eigen::Vector3d x0) {
+  bool success = optim::nm(x0, singlepass_optim, &filedata.events);
+
+  return x0;
+}
+
+double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
+                        void *fd) {
+  if (x0.size() != 3) {
+    throw std::runtime_error("x0 must have exactly 3 elements");
+  }
+
+  Eigen::Vector3d rx0;
+  rx0 << x0(0), x0(1), x0(2); // ✅ Assign explicitly
+
+  filedata_t filedata = *((filedata_t *)fd);
+
+  return singlepass(rx0, filedata);
+}
+
+double singlepass(Eigen::Vector3d x0, filedata_t filedata) {
 
   std::vector<event_t> warped_events = warp_events(filedata.events, x0);
 

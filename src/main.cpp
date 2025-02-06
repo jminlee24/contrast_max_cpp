@@ -1,7 +1,5 @@
-#define OPTIM_ENABLE_EIGEN_WRAPPERS
 #include "contrastmax.hpp"
 #include "filereader.hpp"
-#include "optim/optim.hpp"
 #include <Eigen/Dense>
 
 #include <iostream>
@@ -22,8 +20,7 @@ int main() {
   ContrastMax::blur_image(image, .0);
 
   auto start = std::chrono::high_resolution_clock::now();
-
-  ContrastMax::singlepass(fileData, Eigen::Vector3d(0, 0, 0));
+  ContrastMax::maximize(fileData);
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
