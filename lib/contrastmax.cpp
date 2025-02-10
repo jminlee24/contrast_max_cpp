@@ -72,12 +72,12 @@ void write_image(std::vector<uint64_t> imgdata, uint64_t width,
   return;
 }
 
-void write_image(image_t image) {
+void write_image(image_t image, std::string image_path) {
   std::vector<uint64_t> imgdata = image.imagedata;
   int width = image.width;
   int height = image.height;
 
-  std::ofstream imageFile("image.pgm");
+  std::ofstream imageFile(image_path);
   if (imageFile.is_open()) {
     imageFile << "P2" << std::endl;
     imageFile << width << " " << height << std::endl;
@@ -117,6 +117,18 @@ Eigen::Vector3d maximize(filedata_t filedata) {
   return x0;
 }
 
+Eigen::Vector3d maximize_blur(filedata_t filedata) {
+  Eigen::VectorXd x0(3);
+  x0 << 0, 0, 0;
+
+  bool success = optim::nm(x0, singlepass_optim, &filedata.events);
+  if (!success) {
+    std::cerr << "Optimization was unsuccessful";
+  }
+
+  return x0;
+}
+
 double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
                         void *fd) {
   if (x0.size() != 3) {
@@ -131,7 +143,21 @@ double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
   return singlepass(rx0, filedata);
 }
 
-double singlepass(Eigen::Vector3d x0, filedata_t filedata) {
+double singlepass_optim_blur(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
+                             void *fd) {
+  if (x0.size() != 3) {
+    throw std::runtime_error("x0 must have exactly 3 elements");
+  }
+
+  Eigen::Vector3d rx0;
+  rx0 << x0(0), x0(1), x0(2);
+
+  filedata_t filedata = *((filedata_t *)fd);
+
+  return singlepass_blur(rx0, filedata);
+}
+
+double singlepass_blur(Eigen::Vector3d x0, filedata_t filedata) {
 
   std::vector<event_t> warped_events = warp_events(filedata.events, x0);
 
@@ -143,6 +169,18 @@ double singlepass(Eigen::Vector3d x0, filedata_t filedata) {
 
   blur_image(image, std * 2);
   variance = calculate_variance(image);
+
+  return -variance;
+}
+
+double singlepass(Eigen::Vector3d x0, filedata_t filedata) {
+
+  std::vector<event_t> warped_events = warp_events(filedata.events, x0);
+
+  image_t image = create_image(warped_events, filedata.metadata.width,
+                               filedata.metadata.height);
+
+  double variance = calculate_variance(image);
 
   return -variance;
 }

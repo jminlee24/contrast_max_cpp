@@ -15,6 +15,8 @@ typedef struct {
 typedef struct {
   uint32_t width;
   uint32_t height;
+  uint32_t max_time;
+  uint32_t min_time;
 } metadata_t;
 
 typedef struct {

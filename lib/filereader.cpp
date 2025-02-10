@@ -280,9 +280,4 @@ filedata_t read_file(std::string filename) {
   return filedata;
 }
 
-void print_events(std::vector<event_t> events) {
-  // TODO : not really a todo I should honestly just get rid of this function it
-  // was for debugging
-  return;
-}
 } // namespace FileReader

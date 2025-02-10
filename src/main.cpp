@@ -15,17 +15,22 @@ int main() {
   std::vector<FileReader::event_t> events =
       FileReader::filter_event_time(fileData.events, 1000, 1000000);
 
-  ContrastMax::image_t image =
-      ContrastMax::create_image(fileData.events, width, height);
-  ContrastMax::blur_image(image, .0);
-
   auto start = std::chrono::high_resolution_clock::now();
   Eigen::Vector3d val = ContrastMax::maximize(fileData);
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
 
-  ContrastMax::write_image(image);
+  std::vector<ContrastMax::event_t> warped_events =
+      ContrastMax::warp_events(fileData.events, val);
+
+  ContrastMax::image_t image =
+      ContrastMax::create_image(warped_events, width, height);
+  ContrastMax::write_image(image, "warped.pgm");
+
+  ContrastMax::image_t prev_image =
+      ContrastMax::create_image(fileData.events, width, height);
+  ContrastMax::write_image(prev_image, "prev.pgm");
 
   std::cout << "Single pass: " << elapsed.count() << std::endl;
   std::cout << val << std::endl;
