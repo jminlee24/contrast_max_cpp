@@ -77,11 +77,16 @@ void write_image(image_t image, std::string image_path) {
   int width = image.width;
   int height = image.height;
 
+  uint64_t max = image.max;
+  if (max > 256) {
+    max = 256;
+  }
+
   std::ofstream imageFile(image_path);
   if (imageFile.is_open()) {
     imageFile << "P2" << std::endl;
     imageFile << width << " " << height << std::endl;
-    imageFile << image.max << std::endl;
+    imageFile << max << std::endl;
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         imageFile << imgdata[width * i + j] << " ";
