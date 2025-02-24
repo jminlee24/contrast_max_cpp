@@ -4,18 +4,18 @@
 
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 int main(int argc, char *argv[]) {
   FileReader::filedata_t fileData =
-      FileReader::read_file("../data/recording2.raw");
+      FileReader::read_file("../data/zybo_recording1.raw");
 
   int width = fileData.metadata.width;
   int height = fileData.metadata.height;
 
-  std::cout << fileData.events[0].timestamp << std::endl;
-
+  // take first 1000 ms slice
   fileData.events =
-      FileReader::filter_event_time(fileData.events, 10000000, 10200000);
+      FileReader::filter_event_time(fileData.events, fileData.events[0].timestamp, fileData.events[0].timestamp + 1000000);
 
   ContrastMax::image_t prev_image =
       ContrastMax::create_image(fileData.events, width, height);
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   std::cout << "Single pass: " << elapsed.count() << std::endl;
   std::cout << val << std::endl;
-  std::cout << fileData.events.size() << std::endl;
+  std::cout << "Run on " << fileData.events.size() << " events." << std::endl;
 
   return 0;
 }

@@ -1,7 +1,14 @@
+// used to suppress unused var warnings
+#define UNUSED(x) (void)(x)
 #include "contrastmax.hpp"
-#include "fastgaussianblur.hpp"
+
 #define OPTIM_ENABLE_EIGEN_WRAPPERS
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#include "fastgaussianblur.hpp"
 #include "optim/optim.hpp"
+#pragma GCC diagnostic pop
 
 #include <Eigen/Dense>
 #include <Eigen/src/Core/Matrix.h>
@@ -24,6 +31,11 @@ image_t create_image(std::vector<event_t> events, int width, int height) {
   std::vector<uint64_t> img(height * width, 0);
 
   for (event_t event : events) {
+    // throw out events that are outside the image
+    // TODO: Find a better way to handle this
+    if (event.y >= imageinfo.height || event.x >= imageinfo.width) {
+      continue;
+    }
     img[event.y * imageinfo.width + event.x] += event.pol;
     uint64_t val = img[event.y * imageinfo.width + event.x];
     imageinfo.num_events++;
@@ -136,6 +148,7 @@ Eigen::Vector3d maximize_blur(filedata_t filedata) {
 
 double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
                         void *fd) {
+  UNUSED(grad_out);
   if (x0.size() != 3) {
     throw std::runtime_error("x0 must have exactly 3 elements");
   }
@@ -150,6 +163,7 @@ double singlepass_optim(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
 
 double singlepass_optim_blur(Eigen::VectorXd x0, Eigen::VectorXd *grad_out,
                              void *fd) {
+  UNUSED(grad_out);
   if (x0.size() != 3) {
     throw std::runtime_error("x0 must have exactly 3 elements");
   }
@@ -225,11 +239,12 @@ std::vector<event_t> warp_events(std::vector<event_t> events,
   return warped_events;
 }
 
-event_t warp_event(event_t event, uint64_t t, Eigen::Vector3d theta) {
+event_t warp_event(event_t event, uint64_t time_int, Eigen::Vector3d theta) {
   event_t warped_event;
 
   double x = event.x;
   double y = event.y;
+  double t = (double)time_int / 1000.0;
 
   Eigen::Vector3d event_vector{{x, y, 1}};
 
