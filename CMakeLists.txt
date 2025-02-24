@@ -2,7 +2,12 @@ cmake_minimum_required(VERSION "3.19.2")
 set (CMAKE_CXX_STANDARD 11)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Release E)
+endif()
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+  message(WARNING "It is recommended CMAKE_BUILD_TYPE is set to Release for the best performance \(-DCMAKE_BUILD_TYPE=Release\)")
 endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
