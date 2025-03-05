@@ -1,5 +1,6 @@
 {
-  "filepath": "./data/recording.raw",
+  "filepath": "../data/recording.raw",
   "blur": false,
-  "timeslice": 1000
+  "timeslice": 1000,
+  "generate_images": true
 }
