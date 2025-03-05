@@ -19,6 +19,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 
 find_package(Eigen3 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 add_executable(main src/main.cpp)
 
@@ -26,6 +27,7 @@ target_link_libraries(main filereader)
 target_link_libraries(main contrastmax)
 
 target_link_libraries(main Eigen3::Eigen)
+target_link_libraries(main nlohmann_json::nlohmann_json)
 target_include_directories(main PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/lib/optim/)
 
 add_subdirectory(lib)

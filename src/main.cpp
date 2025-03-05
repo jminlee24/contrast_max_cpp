@@ -1,10 +1,13 @@
 #include "contrastmax.hpp"
 #include "filereader.hpp"
 #include <Eigen/Dense>
+#include <nlohmann/json.hpp>
 
+#include <chrono>
 #include <iostream>
 #include <vector>
-#include <chrono>
+
+using json = nlohmann::json;
 
 int main(int argc, char *argv[]) {
   FileReader::filedata_t fileData =
@@ -14,8 +17,9 @@ int main(int argc, char *argv[]) {
   int height = fileData.metadata.height;
 
   // take first 1000 ms slice
-  fileData.events =
-      FileReader::filter_event_time(fileData.events, fileData.events[0].timestamp, fileData.events[0].timestamp + 1000000);
+  fileData.events = FileReader::filter_event_time(
+      fileData.events, fileData.events[0].timestamp,
+      fileData.events[0].timestamp + 1000000);
 
   ContrastMax::image_t prev_image =
       ContrastMax::create_image(fileData.events, width, height);

@@ -1,0 +1,5 @@
+{
+  "filepath": "./data/recording.raw",
+  "blur": false,
+  "timeslice": 1000
+}
