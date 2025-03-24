@@ -1,12 +1,12 @@
 #include "filereader.hpp"
 #include <algorithm>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <chrono>
 
 namespace FileReader {
 
@@ -73,6 +73,9 @@ filedata_t read_file(std::string filename) {
     metadata.height = 720;
   }
 
+  metadata.min_time = UINT64_MAX;
+  metadata.max_time = 0;
+
   // Vector where we'll read the raw data
   static constexpr uint32_t WORDS_TO_READ =
       1000000; // Number of words to read at a time
@@ -126,10 +129,13 @@ filedata_t read_file(std::string filename) {
 
         events.push_back(event);
 
-        // cd_str += std::to_string(ev_addr_x->x) + "," +
-        //           std::to_string(current_ev_addr_y) + "," +
-        //           std::to_string(ev_addr_x->pol) + "," +
-        //           std::to_string(current_time) + "\n";
+        if (event.timestamp < metadata.min_time) {
+          metadata.min_time = current_time;
+        }
+        if (event.timestamp > metadata.max_time) {
+          metadata.max_time = current_time;
+        }
+
         break;
       }
       case Evt3::EventTypes::VECT_12: {
@@ -151,11 +157,14 @@ filedata_t read_file(std::string filename) {
             event.timestamp = current_time;
             event.pol = current_polarity;
 
+            if (current_time < metadata.min_time) {
+              metadata.min_time = current_time;
+            }
+            if (current_time > metadata.max_time) {
+              metadata.max_time = current_time;
+            }
+
             events.push_back(event);
-            //            cd_str += std::to_string(i) + "," +
-            //                      std::to_string(current_ev_addr_y) + "," +
-            //                      std::to_string(current_polarity) + "," +
-            //                      std::to_string(current_time) + "\n";
           }
           valid >>= 1;
         }
@@ -181,10 +190,15 @@ filedata_t read_file(std::string filename) {
             event.timestamp = current_time;
             event.pol = current_polarity;
 
-            //            cd_str += std::to_string(i) + "," +
-            //                      std::to_string(current_ev_addr_y) + "," +
-            //                      std::to_string(current_polarity) + "," +
-            //                      std::to_string(current_time) + "\n";
+            if (current_time < metadata.min_time) {
+              metadata.min_time = current_time;
+            }
+
+            if (current_time > metadata.max_time) {
+              metadata.max_time = current_time;
+            }
+
+            events.push_back(event);
           }
           valid >>= 1;
         }

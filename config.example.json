@@ -1,5 +1,5 @@
 {
-  "filepath": "../data/blackwater1_rec1_slew9.raw",
+  "filepath": "../data/data.raw",
   "blur": true,
   "timeslice": 1000,
   "generate_images": true

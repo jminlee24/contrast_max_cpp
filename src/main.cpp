@@ -1,6 +1,7 @@
 #include "contrastmax.hpp"
 #include "filereader.hpp"
 #include <Eigen/Dense>
+#include <Eigen/src/Core/Matrix.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
 
@@ -9,6 +10,20 @@
 #include <vector>
 
 using json = nlohmann::json;
+
+#define PBSTR "============================================================"
+#define PBWIDTH 60
+
+void printProgress(double percentage) {
+  int val = (int)(percentage * 100);
+  int lpad = (int)(percentage * PBWIDTH);
+  int rpad = PBWIDTH - lpad;
+  printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
+  fflush(stdout);
+  if (val == 100) {
+    printf("\n");
+  }
+}
 
 int main() {
 
@@ -20,11 +35,6 @@ int main() {
   int width = fileData.metadata.width;
   int height = fileData.metadata.height;
 
-  // take first 1000 ms slice
-  fileData.events = FileReader::filter_event_time(
-      fileData.events, fileData.events[0].timestamp,
-      fileData.events[0].timestamp + 1000000);
-
   auto start = std::chrono::high_resolution_clock::now();
 
   // check if we want to run the maximization with a gaussian blur
@@ -32,7 +42,6 @@ int main() {
 
   // runmax is a function pointer
   Eigen::Vector3d (*runmax)(FileReader::filedata_t);
-  Eigen::Vector3d val;
   if (config["blur"]) {
     std::cout << "Running the optimization with a gaussian blur" << std::endl;
     runmax = ContrastMax::maximize_blur;
@@ -40,7 +49,30 @@ int main() {
     std::cout << "Running the standard optimization" << std::endl;
     runmax = ContrastMax::maximize;
   }
-  val = runmax(fileData);
+
+  uint64_t start_timestamp = fileData.metadata.min_time;
+  uint64_t end_timestamp = fileData.metadata.max_time;
+  uint64_t window_size = config["timeslice"];
+
+  uint64_t i = 0;
+  std::cout << "Start time: " << start_timestamp << std::endl;
+  std::cout << "End time: " << end_timestamp << std::endl;
+
+  auto num_slices = (end_timestamp - start_timestamp) / window_size;
+  // initialize with size
+  std::vector<Eigen::Vector3d> res(num_slices);
+
+  while (start_timestamp + (i * window_size) < end_timestamp) {
+    FileReader::filedata_t temp;
+    temp.metadata = fileData.metadata;
+    temp.events = FileReader::filter_event_time(
+        fileData.events, start_timestamp + (i * window_size),
+        start_timestamp + (i + 1) * window_size);
+
+    res[i] = runmax(temp);
+    i++;
+    printProgress(i / (float)num_slices);
+  }
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
@@ -54,7 +86,7 @@ int main() {
         ContrastMax::create_image(fileData.events, width, height);
 
     std::vector<ContrastMax::event_t> warped_events =
-        ContrastMax::warp_events(fileData.events, val);
+        ContrastMax::warp_events(fileData.events, res[0]);
 
     ContrastMax::image_t image =
         ContrastMax::create_image(warped_events, width, height);
@@ -62,9 +94,8 @@ int main() {
     ContrastMax::write_image(prev_image, "prev.pgm");
     ContrastMax::write_image(image, "warped.pgm");
   }
-  std::cout << "Single pass: " << elapsed.count() << " s" << std::endl;
-  std::cout << val << std::endl;
-  std::cout << "Run on " << fileData.events.size() << " events" << std::endl;
+
+  std::cout << "Elapsed Time: " << elapsed.count() << " s" << std::endl;
 
   return 0;
 }
