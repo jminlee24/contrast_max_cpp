@@ -96,6 +96,7 @@ int main() {
   }
 
   std::cout << "Elapsed Time: " << elapsed.count() << " s" << std::endl;
+  std::cout << "Vector: " << res[1] << std::endl;
 
   return 0;
 }

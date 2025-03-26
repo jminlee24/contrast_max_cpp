@@ -1,6 +1,6 @@
 {
   "filepath": "../data/blackwater1_rec1_slew9.raw",
   "blur": true,
-  "timeslice": 1000,
+  "timeslice": 100000,
   "generate_images": true
 }
