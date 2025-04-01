@@ -31,7 +31,7 @@ if(NOT Eigen3_FOUND AND PACKAGE_PATH)
   set(Eigen3_DIR ${PACKAGE_PATH}/eigen-3.4.0/cmake)
   find_package(Eigen3 REQUIRED )
 elseif(NOT Eigen3_FOUND)
-  set(Eigen3_DIR ${CMAKE_SOURCE_DIR}/packages/eigen-3.4.0/cmake)
+  set(Eigen3_DIR ${CMAKE_SOURCE_DIR}/packages/eigen-3.4.0/build)
   find_package(Eigen3 QUIET)
 endif()
 
