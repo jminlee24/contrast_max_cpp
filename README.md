@@ -8,12 +8,15 @@ Eigen 3.4
 OptimLib - Eigen - Header only 
 nlohmann/json
 
+
 How to make nlohmann/json findable in usr/local for cmake
 
 `
-clone nlohmann/json into usr/local/include
+clone nlohmann/json 
 cmake -B build -DCMAKE_INSTALL_PREFIX=usr/local -DJSON_BuildTests=OFF
 cmake --build build --target install
 `
+
+if you would like to install them locally instead, create a packages folder, and clone/unzip the repos into that folder
 
 MAKE SURE YOU COMPILE IN RELEASE MODE, OR ELSE EIGEN WILL BE LITERALLY 1000x SLOWER
