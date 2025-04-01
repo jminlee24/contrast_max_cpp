@@ -1,13 +1,12 @@
-/out
+out/
 bin/
 build/
 data/
-/.vs
+.vs/
+.vscode/
 .idea/
 CMakeSettings.json
 .cache
 .DS_Store
-./lib/optim/
-./config.json
 config.json
 packages/
