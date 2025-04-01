@@ -21,7 +21,7 @@ find_package(Eigen3 QUIET)
 find_package(nlohmann_json QUIET)
 
 if(NOT Eigen3_FOUND)
-  set(Eigen3_DIR ${CMAKE_SOURCE_DIR}/packages/eigen3.4.0/cmake)
+  set(Eigen3_DIR ${CMAKE_SOURCE_DIR}/packages/eigen-3.4.0/cmake)
   find_package(Eigen3 REQUIRED)
 endif()
 
