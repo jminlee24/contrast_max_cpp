@@ -13,7 +13,7 @@ namespace FileReader {
 std::vector<event_t> filter_event_time(std::vector<event_t> events,
                                        uint64_t t_0, uint64_t t_end) {
 
-  if (t_0 < 0 || t_end < t_0) {
+  if (t_end < t_0) {
     throw std::invalid_argument(
         "t_0 must be greater than 0 and less than t_end");
   }
@@ -68,7 +68,7 @@ filedata_t read_file(std::string filename) {
     }
   }
 
-  if (metadata.width < 0 || metadata.height < 0) {
+  if (metadata.width == 0 || metadata.height == 0) {
     metadata.width = 1280;
     metadata.height = 720;
   }

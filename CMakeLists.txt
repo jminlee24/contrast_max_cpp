@@ -17,9 +17,18 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 project(main)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+find_package(Eigen3 QUIET)
+find_package(nlohmann_json QUIET)
 
-find_package(Eigen3 REQUIRED)
-find_package(nlohmann_json REQUIRED)
+if(NOT Eigen3_FOUND)
+  set(Eigen3_DIR ${CMAKE_SOURCE_DIR}/packages/eigen3.4.0/cmake)
+  find_package(Eigen3 REQUIRED)
+endif()
+
+if(NOT nlohmann_json_FOUND)
+  set(nlohmann_json_DIR ${CMAKE_SOURCE_DIR}/packages/json/build)
+  find_package(nlohmann_json QUIET)
+endif()
 
 add_executable(main src/main.cpp)
 

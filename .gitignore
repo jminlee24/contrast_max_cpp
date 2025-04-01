@@ -9,3 +9,5 @@ CMakeSettings.json
 .DS_Store
 ./lib/optim/
 ./config.json
+config.json
+packages/
