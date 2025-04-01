@@ -18,5 +18,7 @@ cmake --build build --target install
 `
 
 if you would like to install them locally instead, create a packages folder, and clone/unzip the repos into that folder
+for json, make a build folder and build using cmake
+for eigen you just need to unzip it
 
 MAKE SURE YOU COMPILE IN RELEASE MODE, OR ELSE EIGEN WILL BE LITERALLY 1000x SLOWER
