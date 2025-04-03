@@ -242,11 +242,14 @@ std::vector<event_t> warp_events(std::vector<event_t> events,
 event_t warp_event(event_t event, uint64_t time_int, Eigen::Vector3d theta) {
   event_t warped_event;
 
+  // normalize x and y
   double x = event.x;
   double y = event.y;
+
   double t = (double)time_int / 1000.0;
 
-  Eigen::Vector3d event_vector{{x, y, 1}};
+  Eigen::Vector3d event_vector{
+      {x, y, sqrt((1280 * 1280 + 720 * 720) - x * x - y * y)}};
 
   Eigen::Matrix3d theta_hat = get_rotation_matrix(
       theta.coeff(0) * t, theta.coeff(1) * t, theta.coeff(2) * t);
