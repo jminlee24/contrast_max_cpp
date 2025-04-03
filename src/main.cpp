@@ -18,6 +18,11 @@ void printProgress(double percentage) {
   int val = (int)(percentage * 100);
   int lpad = (int)(percentage * PBWIDTH);
   int rpad = PBWIDTH - lpad;
+
+  if (val > 100) {
+    return;
+  }
+
   printf("\r%3d%% [%.*s%*s]", val, lpad, PBSTR, rpad, "");
   fflush(stdout);
   if (val == 100) {
@@ -59,10 +64,15 @@ int main() {
   std::cout << "End time: " << end_timestamp << std::endl;
 
   auto num_slices = (end_timestamp - start_timestamp) / window_size;
+  if (num_slices == 0) {
+    num_slices = 1;
+  }
   // initialize with size
   std::vector<Eigen::Vector3d> res(num_slices);
 
-  while (start_timestamp + (i * window_size) < end_timestamp) {
+  std::cout << num_slices << std::endl;
+
+  do {
     FileReader::filedata_t temp;
     temp.metadata = fileData.metadata;
     temp.events = FileReader::filter_event_time(
@@ -72,7 +82,7 @@ int main() {
     res[i] = runmax(temp);
     i++;
     printProgress(i / (float)num_slices);
-  }
+  } while (start_timestamp + (i * window_size) < end_timestamp);
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
@@ -96,7 +106,7 @@ int main() {
   }
 
   std::cout << "Elapsed Time: " << elapsed.count() << " s" << std::endl;
-  std::cout << "Vector: " << res[1] << std::endl;
+  std::cout << "Vector: " << res[0] << std::endl;
 
   return 0;
 }
