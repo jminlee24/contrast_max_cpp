@@ -58,7 +58,6 @@ int main() {
   uint64_t end_timestamp = fileData.metadata.max_time;
   uint64_t window_size = config["timeslice"];
 
-  uint64_t i = 0;
   std::cout << "Start time: " << start_timestamp << std::endl;
   std::cout << "End time: " << end_timestamp << std::endl;
 
@@ -73,6 +72,8 @@ int main() {
 
   // initialize with size
   std::vector<Eigen::Vector3d> res(num_slices);
+
+  uint64_t i = 0;
 
   do {
     FileReader::filedata_t temp;
