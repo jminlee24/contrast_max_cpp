@@ -1,6 +1,7 @@
 {
   "filepath": "../data/data.raw",
   "blur": true,
+  "sliding_window": true,
   "timeslice": 1000,
   "generate_images": true
 }

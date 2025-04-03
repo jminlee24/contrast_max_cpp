@@ -40,8 +40,6 @@ int main() {
   int width = fileData.metadata.width;
   int height = fileData.metadata.height;
 
-  auto start = std::chrono::high_resolution_clock::now();
-
   // check if we want to run the maximization with a gaussian blur
   // with sigma = 2 * sqrt(variance)
 
@@ -55,6 +53,7 @@ int main() {
     runmax = ContrastMax::maximize;
   }
 
+  auto start = std::chrono::high_resolution_clock::now();
   uint64_t start_timestamp = fileData.metadata.min_time;
   uint64_t end_timestamp = fileData.metadata.max_time;
   uint64_t window_size = config["timeslice"];
@@ -64,13 +63,16 @@ int main() {
   std::cout << "End time: " << end_timestamp << std::endl;
 
   auto num_slices = (end_timestamp - start_timestamp) / window_size;
-  if (num_slices == 0) {
+  if (num_slices == 0 || config["sliding_window"] == false) {
     num_slices = 1;
+    window_size = start_timestamp - end_timestamp;
   }
+
+  std::cout << "Running optimization with " << num_slices << " sliding windows"
+            << std::endl;
+
   // initialize with size
   std::vector<Eigen::Vector3d> res(num_slices);
-
-  std::cout << num_slices << std::endl;
 
   do {
     FileReader::filedata_t temp;
