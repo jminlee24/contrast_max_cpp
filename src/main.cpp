@@ -89,14 +89,20 @@ int main() {
 
   // if we want to show some images of the warped events and the previous image
   if (config["generate_images"]) {
-    std::cout << "Generate previous image at prev.pgm, and the warped image at "
-                 "warped.pgm \n";
+    std::cout
+        << "Generated images for the first window at: warped.pgm, and prev.pgm"
+        << std::endl;
+
+    FileReader::filedata_t tempData = {
+        ContrastMax::filter_event_time(fileData.events, start_timestamp,
+                                       start_timestamp + window_size),
+        fileData.metadata};
 
     ContrastMax::image_t prev_image =
-        ContrastMax::create_image(fileData.events, width, height);
+        ContrastMax::create_image(tempData.events, width, height);
 
     std::vector<ContrastMax::event_t> warped_events =
-        ContrastMax::warp_events(fileData.events, res[0]);
+        ContrastMax::warp_events(tempData.events, res[0]);
 
     ContrastMax::image_t image =
         ContrastMax::create_image(warped_events, width, height);
