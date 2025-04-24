@@ -112,6 +112,10 @@ int main() {
 
     ContrastMax::write_image(prev_image, "prev.pgm");
     ContrastMax::write_image(image, "warped.pgm");
+
+    ContrastMax::write_file_events("normal.txt", fileData);
+    tempData.events = warped_events;
+    ContrastMax::write_file_events("warped.txt", tempData);
   }
 
   std::cout << "Elapsed Time: " << elapsed.count() << " s" << std::endl;

@@ -10,6 +10,23 @@
 
 namespace FileReader {
 
+void write_file_events(std::string filename, filedata_t file) {
+
+  std::ofstream f(filename);
+
+  if (f.is_open()) {
+    f << file.metadata.height << " " << file.metadata.width << std::endl;
+    f << file.metadata.max_time << std::endl;
+
+    for (auto events : file.events) {
+      f << events.x << " " << events.y << " " << events.pol << " "
+        << events.timestamp << std::endl;
+    }
+  }
+
+  return;
+}
+
 std::vector<event_t> filter_event_time(std::vector<event_t> events,
                                        uint64_t t_0, uint64_t t_end) {
 

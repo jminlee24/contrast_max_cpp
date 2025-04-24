@@ -231,6 +231,7 @@ std::vector<event_t> warp_events(std::vector<event_t> events,
     uint64_t t = event.timestamp - t0;
 
     event_t warped_event = warp_event(event, t, theta);
+    warped_event.timestamp = t + t0;
     if (warped_event.pol != 2) {
       warped_events.push_back(warped_event);
     }

@@ -25,6 +25,7 @@ typedef struct {
 } filedata_t;
 
 filedata_t read_file(std::string filename);
+void write_file_events(std::string filename, filedata_t file);
 
 std::vector<event_t> filter_event_time(std::vector<event_t>, uint64_t,
                                        uint64_t);
