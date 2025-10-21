@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using json = nlohmann::json;
@@ -95,27 +96,28 @@ int main() {
     std::cout
         << "Generated images for the first window at: warped.pgm, and prev.pgm"
         << std::endl;
+    for (int i = 0; i < num_slices; i++) {
+      FileReader::filedata_t tempData = {
+          ContrastMax::filter_event_time(fileData.events, start_timestamp + window_size * i,
+                                         start_timestamp + window_size * (i+1)),
+          fileData.metadata};
 
-    FileReader::filedata_t tempData = {
-        ContrastMax::filter_event_time(fileData.events, start_timestamp,
-                                       start_timestamp + window_size),
-        fileData.metadata};
+      ContrastMax::image_t prev_image =
+          ContrastMax::create_image(tempData.events, width, height);
 
-    ContrastMax::image_t prev_image =
-        ContrastMax::create_image(tempData.events, width, height);
+      std::vector<ContrastMax::event_t> warped_events =
+          ContrastMax::warp_events(tempData.events, res[i]);
 
-    std::vector<ContrastMax::event_t> warped_events =
-        ContrastMax::warp_events(tempData.events, res[0]);
+      ContrastMax::image_t image =
+          ContrastMax::create_image(warped_events, width, height);
 
-    ContrastMax::image_t image =
-        ContrastMax::create_image(warped_events, width, height);
+      ContrastMax::write_image(prev_image, "prev" + std::to_string(i) + ".pgm");
+      ContrastMax::write_image(image, "warped" + std::to_string(i) + ".pgm");
 
-    ContrastMax::write_image(prev_image, "prev.pgm");
-    ContrastMax::write_image(image, "warped.pgm");
-
-    ContrastMax::write_file_events("normal.txt", fileData);
-    tempData.events = warped_events;
-    ContrastMax::write_file_events("warped.txt", tempData);
+      ContrastMax::write_file_events("normal.txt", fileData);
+      tempData.events = warped_events;
+      ContrastMax::write_file_events("warped.txt", tempData);
+    }
   }
 
   std::cout << "Elapsed Time: " << elapsed.count() << " s" << std::endl;
