@@ -240,14 +240,73 @@ std::vector<event_t> warp_events(std::vector<event_t> events,
   return warped_events;
 }
 
+inline Eigen::Matrix3d hat3(const Eigen::Vector3d &w) {
+  Eigen::Matrix3d W;
+  W << 0, -w.z(), w.y(), w.z(), 0, -w.x(), -w.y(), w.x(), 0;
+  return W;
+}
+
+Eigen::Matrix3d exp_so3(const Eigen::Vector3d &omega, double t) {
+
+  double theta = omega.norm();
+  Eigen::Matrix3d R = Eigen::Matrix3d::Identity();
+  if (theta < 1e-12) {
+    // small-angle approx: R ≈ I + t * hat(omega)
+    R += t * hat3(omega);
+  } else {
+    Eigen::Matrix3d W = hat3(omega / theta); // normalized hat
+    double tht = theta * t;
+    R = Eigen::Matrix3d::Identity() + sin(tht) * W + (1.0 - cos(tht)) * (W * W);
+  }
+
+  return R;
+}
+
 event_t warp_event(event_t event, uint64_t time_int, Eigen::Vector3d theta) {
   event_t warped_event;
 
+  // TODO: parameterize fx, fy, cx, cy
+  double fx = 800., fy = 800., cx = 640., cy = 360.;
+
   // normalize x and y
-  double x = event.x;
-  double y = event.y;
+  double x = (event.x - cx) / fx;
+  double y = (event.y - cy) / fy;
 
   double t = (double)time_int / 1000.0;
+
+  Eigen::Vector3d X(x, y, 1);
+
+  Eigen::Matrix3d R = exp_so3(theta, t);
+
+  Eigen::Vector3d Xp = R * X;
+
+  // 4) Reproject to pixel plane (pinhole)
+  double Zp = Xp.z();
+  // Avoid division by zero
+  if (Zp <= 1e-9) {
+    warped_event.pol = 2; // mark invalid / behind camera
+    return warped_event;
+  }
+
+  double xp = fx * (Xp.x() / Zp) + cx;
+  double yp = fy * (Xp.y() / Zp) + cy;
+
+  warped_event.x = xp;
+  warped_event.y = yp;
+  warped_event.timestamp += (uint64_t)t; // or set to desired reference time
+  warped_event.pol = event.pol;
+
+  // TODO: STOP HARDCODING VALUES YOU MONKEY
+
+  // Mark out-of-bounds events
+  if (xp < 0.0 || yp < 0.0 || xp >= 1280 || yp >= 720) {
+    warped_event.pol = 2;
+  }
+
+  return warped_event;
+
+  // TODO:
+  // get rid of this eventually and do a full refactor into classes
 
   Eigen::Vector3d event_vector{
       {x, y, sqrt((1280 * 1280 + 720 * 720) - x * x - y * y)}};
