@@ -266,9 +266,9 @@ event_t warp_event(event_t event, uint64_t time_int, Eigen::Vector3d theta) {
   event_t warped_event;
 
   // TODO: parameterize fx, fy, cx, cy
-  double fx = 800., fy = 800., cx = 640., cy = 360.;
+  double fx = 284., fy = 192., cx = 640., cy = 360.;
 
-  // normalize x and y
+  // normalize x and ycmaxcp
   double x = (event.x - cx) / fx;
   double y = (event.y - cy) / fy;
 
