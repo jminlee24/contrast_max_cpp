@@ -2,6 +2,10 @@
 
 This project processes event-based camera data using contrast maximization optimization. The file reader is a modified version of the sample given in the Metavision SDK that decodes raw event data into arrays rather than CSV format.
 
+This implementation is based on the contrast maximization framework described in:
+
+**Gallego, G., Rebecq, H., & Scaramuzza, D. (2018).** *A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation.* IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Salt Lake City, 2018. [arXiv:1804.01306](https://arxiv.org/abs/1804.01306)
+
 ## Prerequisites
 
 The following libraries are required:
@@ -173,3 +177,7 @@ Before running the program, create a `config.json` file in the project root (you
 - The program processes event camera data by maximizing contrast through spatial warping
 - Multiple optimization algorithms are available (with/without Gaussian blur)
 - Processing can be done on the entire dataset or using sliding windows for temporal analysis
+
+## References
+
+**Gallego, G., Rebecq, H., & Scaramuzza, D. (2018).** *A Unifying Contrast Maximization Framework for Event Cameras, with Applications to Motion, Depth, and Optical Flow Estimation.* IEEE Conference on Computer Vision and Pattern Recognition (CVPR), Salt Lake City, 2018. [arXiv:1804.01306](https://arxiv.org/abs/1804.01306) | [DOI: 10.1109/CVPR.2018.00407](https://doi.org/10.1109/CVPR.2018.00407)
